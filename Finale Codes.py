@@ -46,7 +46,6 @@ if ticker == '':
 else:
     ticker = ticker
 print(ticker)
-    
 
 #Verfalldatum der Option definieren
 expiry = input("Verfallsdatum (mm-dd-yyyy): ")
@@ -57,10 +56,10 @@ else:
 print(expiry)
 
 #Tagesdifferenz Heute bis Verfall
-month, day, year = map(int, expiry.split('-'))
-expiry = datetime.date(year, month, day)
-delta = (expiry - today)
-time_int = delta.days
+month, day, year = map(int, expiry.split('-'))  #Datum wird in Einzelteile zerlegt
+expiry = datetime.date(year, month, day)        #Datum wird korrekt formatiert 
+delta = (expiry - today)                        #Differenz zwischen heute und Verfallsdatum
+time_int = delta.days                           #Differenz wird in Tagen definiert
 
 #Anzahl Simulationen
 iterations = input("Anzahl Simulationen: ")
@@ -80,10 +79,10 @@ data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = today)['Adj 
     #Mit dem Drift wird die .......... definiert
 
 log_returns = np.log(1 + data.pct_change()) #Log returns berechnen
-u = log_returns.mean() #Mittelwert der log returns
-var = log_returns.var() #Varianz der log returns
-stdev = log_returns.std() #Standardabweichung der log returns
-drift = u - (0.5 * var) #Drift berechnen
+u = log_returns.mean()                      #Mittelwert der log returns
+var = log_returns.var()                     #Varianz der log returns
+stdev = log_returns.std()                   #Standardabweichung der log returns
+drift = u - (0.5 * var)                     #Drift berechnen
 
 daily_returns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(time_int, iterations)))
 #Takes last data point as startpoint point for simulation
