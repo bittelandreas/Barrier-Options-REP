@@ -13,35 +13,48 @@ import matplotlib.pyplot as plt
 import time
 import math
 import datetime
+from datetime import date
 from scipy.stats import norm
 
 %matplotlib inline
 
-
+#Einführung
+print('Ihnen werden gleich verschiedene Fragen gestellt, damit Sie die Inputvariablen defineiren können.\n'
+'Falls Sie dies nicht wünschen, können Sie jeweils mit der "Enter"-Taste durchklicken.\n'
+'Folgende Standardeinstellungen würden für die Berechnungen dienen:\n'
+'- Option:              Call\n'
+'- Ticker:              Novartis\n'
+'- Verfallsdatum:       04-16-2021\n'
+'- Anzahl Simulationen: 10000')
+time.sleep(0.5)
 
 #Heutiges Datum definieren
 today = date.today()
 
 #Berechnungen für Call oder Put Option
-cp = input('Call (c) oder Put (p)? (Standardeinstellung: Call) ')
+cp = input('Call (c) oder Put (p)? ')
 if cp == '':
     cp = 'c'
 else:
     cp = cp
+print(cp)
 
 #Ticker definieren
-ticker = input('YahooFinance-Ticker (Standardeinstellung: Novartis): ')
+ticker = input('Ticker: ')
 if ticker == '':
     ticker = 'NVS'
 else:
     ticker = ticker
+print(ticker)
+    
 
 #Verfalldatum der Option definieren
-expiry = input("Verfallsdatum (mm-dd-yyyy) (Standardeinstellung: 04-16-2021): ")
+expiry = input("Verfallsdatum (mm-dd-yyyy): ")
 if expiry == '':
     expiry = '04-16-2021'
 else:
     expiry = expiry
+print(expiry)
 
 #Tagesdifferenz Heute bis Verfall
 month, day, year = map(int, expiry.split('-'))
@@ -50,21 +63,17 @@ delta = (expiry - today)
 time_int = delta.days
 
 #Anzahl Simulationen
-iterations = input("Anzahl Simulationen (Standardeinstellung: 10'000): ")
+iterations = input("Anzahl Simulationen: ")
 if iterations == '':
     iterations = 10000
 else:
     iterations = iterations
+print(iterations)
 
 
 #Daten ziehen
 data = pd.DataFrame()
 data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = today)['Adj Close']
-
-
-
-
-# In[7]:
 
 
 #Drift vorbereiten und "Zufallsgenerator" erstellen
@@ -81,7 +90,9 @@ daily_returns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(tim
 S0 = data.iloc[-1]
 price_list = np.zeros_like(daily_returns)
 price_list[0] = S0
-#Applies Monte Carlo simulation in asset
+
+
+#Einzelne Monte Carlo Simulation
 for t in range(1, time_int):
     price_list[t] = price_list[t - 1] * daily_returns[t]
 
@@ -93,15 +104,11 @@ plt.plot(price_list);
 # In[ ]:
 
 #Black-Scholes berechnen
-
 def bs(S,K,T,r,sigma):
     def d1(S,K,T,r,sigma): #Berechnung von d1
         return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
     def d2(S,K,T,r,sigma): #Berechnung von d2
         return d1(S,K,T,r,sigma)-sigma*sqrt(T)
-
-
-# In[ ]:
 
 #Plain Vanilla Optionen berechnen
 def bs_call(S,K,T,r,sigma): #Plain Vanilla Call Option
@@ -114,21 +121,20 @@ def bs_put(S,K,T,r,sigma): #Plain Vanilla Put Option
 # In[ ]:
 
 
-
 df = wb.DataReader(ticker, data_source='yahoo', start='2018-1-1')
-df = df.sort_values(by="Date")
+df = df.sort_values(by = 'Date')
 df = df.dropna()
 df = df.assign(close_day_before=df.Close.shift(1))
 df['returns'] = ((df.Close - df.close_day_before)/df.close_day_before)
 
 S = price_list[-1].mean()
-strike_price = float(input("Strike: "))
+K = float(input("Strike: "))
 sigma = np.sqrt(252) * df['returns'].std()
-r = -0.0028
+r = -0.00283 #Aktueller Zinssatz einer 10y Schweizer Staatsanleihe
 t = (datetime.strptime(expiry, "%m-%d-%Y") - datetime.utcnow()).days / 365
 
-if (cp == "c"):
-    print('The Option Price is: ', round(bs_call(S, strike_price, t, r, sigma),2))
+if cp == 'c':
+    print('Der Preis für die Call Option beträgt: ', round(bs_call(S, K, t, r, sigma),2))
 else:
-    print('The Option Price is: ', round(bs_put(S, strike_price, t, r, sigma),2))
+    print('Der Preis für die Put Option beträgt: ', round(bs_put(S, K, t, r, sigma),2))
 
