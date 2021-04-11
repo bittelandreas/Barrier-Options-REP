@@ -4,17 +4,19 @@
 # In[1]:
 
 
-#Import Libraries
+#Bibliotheken importieren
 import numpy as np  
-import pandas as pd  
+import pandas as pd
+from pandas import DataFrame
 import pandas_datareader as wb  
 import matplotlib.pyplot as plt
 import time
-from math import log, sqrt, pi, exp
-from pandas import DataFrame
+import math
 from scipy.stats import norm
 from datetime import datetime, date
-get_ipython().run_line_magic('matplotlib', 'inline')
+
+%matplotlib inline
+#get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 #Settings for Monte Carlo asset data, how long, and how many forecasts 
