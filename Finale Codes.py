@@ -12,29 +12,55 @@ import pandas_datareader as wb
 import matplotlib.pyplot as plt
 import time
 import math
+import datetime
 from scipy.stats import norm
-from datetime import datetime, date
+
 
 %matplotlib inline
-#get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-#Settings for Monte Carlo asset data, how long, and how many forecasts 
 
+#Heutiges Datum definieren
 today = date.today()
 
-cp = input("Willst du einen Call (c) oder einen Put (p) berechnen?");
-ticker = input("YahooFinance-Ticker: ") #NVS'
-expiry = time(input("Verfall (mm-dd-yyyy): ")#'04-16-2021'
-diff = expiry-today
-t_intervals = diff.days # time steps forecasted into future
-iterations = input("Anzahl Simulationen: ") # amount of simulations
+#Berechnungen für Call oder Put Option
+cp = input('Call (c) oder Put (p)? (Standardeinstellung: Call) ')
+if cp == '':
+    cp = 'c'
+else:
+    cp = cp
+
+#Ticker definieren
+ticker = input('YahooFinance-Ticker (Standardeinstellung: Novartis): ')
+if ticker == '':
+    ticker = 'NVS'
+else:
+    ticker = ticker
+
+#Verfalldatum der Option definieren
+expiry = input("Verfallsdatum (mm-dd-yyyy) (Standardeinstellung: 04-16-2021): ")
+if expiry == '':
+    expiry = '04-16-2021'
+else:
+    expiry = expiry
+
+#Tagesdifferenz Heute bis Verfall
+month, day, year = map(int, expiry.split('-'))
+expiry = datetime.date(year, month, day)
+delta = (expiry - today)
+time_int = delta.days
+
+#Anzahl Simulationen
+iterations = input("Anzahl Simulationen (Standardeinstellung: 10'000): ")
+if iterations == '':
+    iterations = 10000
+else:
+    iterations = iterations
 
 
-#Acquiring data
-
+#Daten ziehen
 data = pd.DataFrame()
-data[ticker] = wb.DataReader(ticker, data_source='yahoo', start= today)['Adj Close']
+data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = today)['Adj Close']
 
 #Preparing log returns from data
 log_returns = np.log(1 + data.pct_change())
@@ -50,13 +76,13 @@ var = log_returns.var()
 drift = u - (0.5 * var)
 stdev = log_returns.std()
 
-daily_returns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(t_intervals, iterations)))
+daily_returns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(time_int, iterations)))
 #Takes last data point as startpoint point for simulation
 S0 = data.iloc[-1]
 price_list = np.zeros_like(daily_returns)
 price_list[0] = S0
 #Applies Monte Carlo simulation in asset
-for t in range(1, t_intervals):
+for t in range(1, time_int):
     price_list[t] = price_list[t - 1] * daily_returns[t]
 
 #Plot simulations
