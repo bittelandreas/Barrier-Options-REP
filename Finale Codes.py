@@ -19,7 +19,7 @@ from scipy.stats import norm
 %matplotlib inline
 
 #Einführung
-print('Ihnen werden gleich verschiedene Fragen gestellt, damit Sie die Inputvariablen defineiren können.\n'
+print('Ihnen werden gleich verschiedene Fragen gestellt, damit Sie die Inputvariablen definieren können.\n'
 'Falls Sie dies nicht wünschen, können Sie jeweils mit der "Enter"-Taste durchklicken.\n'
 'Folgende Standardeinstellungen würden für die Berechnungen dienen:\n'
 '- Option:              Call\n'
