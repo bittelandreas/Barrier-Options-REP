@@ -15,7 +15,6 @@ import math
 import datetime
 from scipy.stats import norm
 
-
 %matplotlib inline
 
 
@@ -62,19 +61,20 @@ else:
 data = pd.DataFrame()
 data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = today)['Adj Close']
 
-#Preparing log returns from data
-log_returns = np.log(1 + data.pct_change())
+
 
 
 # In[7]:
 
 
-#Setting up drift and random component in relation to asset data
+#Drift vorbereiten und "Zufallsgenerator" erstellen
+    #Mit dem Drift wird die .......... definiert
 
-u = log_returns.mean()
-var = log_returns.var()
-drift = u - (0.5 * var)
-stdev = log_returns.std()
+log_returns = np.log(1 + data.pct_change()) #Log returns berechnen
+u = log_returns.mean() #Mittelwert der log returns
+var = log_returns.var() #Varianz der log returns
+stdev = log_returns.std() #Standardabweichung der log returns
+drift = u - (0.5 * var) #Drift berechnen
 
 daily_returns = np.exp(drift.values + stdev.values * norm.ppf(np.random.rand(time_int, iterations)))
 #Takes last data point as startpoint point for simulation
@@ -85,27 +85,29 @@ price_list[0] = S0
 for t in range(1, time_int):
     price_list[t] = price_list[t - 1] * daily_returns[t]
 
-#Plot simulations
+#Monte Carlo Simulationen werden dargestellt
 plt.figure(figsize=(10,6))
 plt.plot(price_list);
 
 
 # In[ ]:
 
+#Black-Scholes berechnen
 
-def d1(S,K,T,r,sigma):
-    return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
-def d2(S,K,T,r,sigma):
-    return d1(S,K,T,r,sigma)-sigma*sqrt(T)
+def bs(S,K,T,r,sigma):
+    def d1(S,K,T,r,sigma): #Berechnung von d1
+        return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
+    def d2(S,K,T,r,sigma): #Berechnung von d2
+        return d1(S,K,T,r,sigma)-sigma*sqrt(T)
 
 
 # In[ ]:
 
-
-def bs_call(S,K,T,r,sigma):
+#Plain Vanilla Optionen berechnen
+def bs_call(S,K,T,r,sigma): #Plain Vanilla Call Option
     return S*norm.cdf(d1(S,K,T,r,sigma))-K*exp(-r*T)*norm.cdf(d2(S,K,T,r,sigma))
   
-def bs_put(S,K,T,r,sigma):
+def bs_put(S,K,T,r,sigma): #Plain Vanilla Put Option
     return K*exp(-r*T)*norm.cdf(-d2(S,K,T,r,sigma))-S*norm.cdf(-d1(S,K,T,r,sigma))
 
 
