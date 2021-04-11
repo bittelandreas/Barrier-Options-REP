@@ -18,42 +18,12 @@ from scipy.stats import norm
 
 %matplotlib inline
 
-#Einführung
-print('Ihnen werden gleich verschiedene Fragen gestellt, damit Sie die Inputvariablen defineiren können.\n'
-'Falls Sie dies nicht wünschen, können Sie jeweils mit der "Enter"-Taste durchklicken.\n'
-'Folgende Standardeinstellungen würden für die Berechnungen dienen:\n'
-'- Option:              Call\n'
-'- Ticker:              Novartis\n'
-'- Verfallsdatum:       04-16-2021\n'
-'- Anzahl Simulationen: 10000')
-time.sleep(0.5)
 
-#Heutiges Datum definieren
-today = date.today()
-
-#Berechnungen für Call oder Put Option
-cp = input('Call (c) oder Put (p)? ')
-if cp == '':
-    cp = 'c'
-else:
-    cp = cp
-print(cp)
-
-#Ticker definieren
-ticker = input('Ticker: ')
-if ticker == '':
-    ticker = 'NVS'
-else:
-    ticker = ticker
-print(ticker)
-
-#Verfalldatum der Option definieren
-expiry = input("Verfallsdatum (mm-dd-yyyy): ")
-if expiry == '':
-    expiry = '04-16-2021'
-else:
-    expiry = expiry
-print(expiry)
+#Inputvariablen
+today = date.today()    #Heutiges Datum definieren
+cp = 'c'                #Berechnungen für Call oder Put Option
+ticker = 'NVS'          #Ticker definieren
+expiry = '04-16-2021'   #Verfalldatum der Option definieren
 
 #Tagesdifferenz Heute bis Verfall
 month, day, year = map(int, expiry.split('-'))  #Datum wird in Einzelteile zerlegt
@@ -61,14 +31,7 @@ expiry = datetime.date(year, month, day)        #Datum wird korrekt formatiert
 delta = (expiry - today)                        #Differenz zwischen heute und Verfallsdatum
 time_int = delta.days                           #Differenz wird in Tagen definiert
 
-#Anzahl Simulationen
-iterations = input("Anzahl Simulationen: ")
-if iterations == '':
-    iterations = 10000
-else:
-    iterations = iterations
-print(iterations)
-
+iterations = 10000 #Anzahl Simulationen
 
 #Daten ziehen
 data = pd.DataFrame()
@@ -127,7 +90,7 @@ df = df.assign(close_day_before=df.Close.shift(1))
 df['returns'] = ((df.Close - df.close_day_before)/df.close_day_before)
 
 S = price_list[-1].mean()
-K = float(input("Strike: "))
+K = 80
 sigma = np.sqrt(252) * df['returns'].std()
 r = -0.00283 #Aktueller Zinssatz einer 10y Schweizer Staatsanleihe
 t = (datetime.strptime(expiry, "%m-%d-%Y") - datetime.utcnow()).days / 365
