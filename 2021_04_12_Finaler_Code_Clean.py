@@ -92,7 +92,7 @@ df['returns'] = ((df.Close - df.close_day_before)/df.close_day_before)
 S = price_list[-1].mean()
 K = 80
 sigma = np.sqrt(252) * df['returns'].std()
-r = -0.00283 #Aktueller Zinssatz einer 10y Schweizer Staatsanleihe
+r = -0.00263 #Aktueller Zinssatz einer 10y Schweizer Staatsanleihe
 t = time_int / 365
 
 if cp == 'c':
