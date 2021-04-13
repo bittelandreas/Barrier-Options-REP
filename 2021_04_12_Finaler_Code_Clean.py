@@ -23,7 +23,7 @@ from math import log, sqrt, pi, exp
 #Inputvariablen
 today = date.today()    #Heutiges Datum definieren
 cp = 'c'                #Berechnungen für Call oder Put Option
-ticker = 'NVS'          #Ticker definieren
+ticker = 'NOVN.SW'          #Ticker definieren
 expiry = '04-16-2021'   #Verfalldatum der Option definieren
 
 #Tagesdifferenz Heute bis Verfall
