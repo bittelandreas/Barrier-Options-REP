@@ -15,6 +15,7 @@ import math
 import datetime
 from datetime import date
 from scipy.stats import norm
+from math import log, sqrt, pi, exp
 
 %matplotlib inline
 
@@ -35,7 +36,7 @@ iterations = 10000 #Anzahl Simulationen
 
 #Daten ziehen
 data = pd.DataFrame()
-data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = today)['Adj Close']
+data[ticker] = wb.DataReader(ticker, data_source = 'yahoo', start = '2016-1-1')['Adj Close']
 
 
 #Drift vorbereiten und "Zufallsgenerator" erstellen
@@ -66,11 +67,10 @@ plt.plot(price_list);
 # In[ ]:
 
 #Black-Scholes berechnen
-def bs(S,K,T,r,sigma):
-    def d1(S,K,T,r,sigma): #Berechnung von d1
-        return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
-    def d2(S,K,T,r,sigma): #Berechnung von d2
-        return d1(S,K,T,r,sigma)-sigma*sqrt(T)
+def d1(S,K,T,r,sigma): #Berechnung von d1
+     return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
+def d2(S,K,T,r,sigma): #Berechnung von d2
+     return d1(S,K,T,r,sigma)-sigma*sqrt(T)
 
 #Plain Vanilla Optionen berechnen
 def bs_call(S,K,T,r,sigma): #Plain Vanilla Call Option
@@ -93,7 +93,7 @@ S = price_list[-1].mean()
 K = 80
 sigma = np.sqrt(252) * df['returns'].std()
 r = -0.00283 #Aktueller Zinssatz einer 10y Schweizer Staatsanleihe
-t = (datetime.strptime(expiry, "%m-%d-%Y") - datetime.utcnow()).days / 365
+t = time_int / 365
 
 if cp == 'c':
     print('Der Preis für die Call Option beträgt: ', round(bs_call(S, K, t, r, sigma),2))
