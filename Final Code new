@@ -1,0 +1,59 @@
+import numpy as np  
+import pandas as pd
+from pandas import DataFrame
+import pandas_datareader as wb  
+import matplotlib.pyplot as plt
+import time
+import math
+import datetime
+from datetime import date
+from scipy.stats import norm
+from math import log, sqrt, pi, exp
+from brown_motion import brown_motion
+from pricing_bs import pricing_bs
+%matplotlib inline
+
+today = date.today()    #Heutiges Datum definieren
+cp = 'c'                #Berechnungen für Call oder Put Option
+ticker = 'NOVN.SW'          #Ticker definieren
+expiry = '05-21-2021'   #Verfalldatum der Option definieren
+
+#Tagesdifferenz Heute bis Verfall
+month, day, year = map(int, expiry.split('-'))  #Datum wird in Einzelteile zerlegt
+expiry = datetime.date(year, month, day)        #Datum wird korrekt formatiert 
+delta = (expiry - today)                        #Differenz zwischen heute und Verfallsdatum
+time_int = delta.days                           #Differenz wird in Tagen definiert
+iterations = 10000 #Anzahl Simulationen
+
+
+def d1(S,K,T,r,sigma): #Berechnung von d1
+    return(log(S/K)+(r+sigma**2/2)*T)/(sigma*sqrt(T))
+def d2(S,K,T,r,sigma): #Berechnung von d2
+    return d1(S,K,T,r,sigma)-sigma*sqrt(T)
+
+
+#Plain Vanilla Optionen berechnen
+def bs_call(S,K,T,r,sigma): #Plain Vanilla Call Option
+    return S*norm.cdf(d1(S,K,T,r,sigma))-K*exp(-r*T)*norm.cdf(d2(S,K,T,r,sigma))
+  
+def bs_put(S,K,T,r,sigma): #Plain Vanilla Put Option
+    return K*exp(-r*T)*norm.cdf(-d2(S,K,T,r,sigma))-S*norm.cdf(-d1(S,K,T,r,sigma))
+
+
+S = 80.35
+K = 82
+sigma = 0.1557
+r = -0.0502
+t =  time_int / 365
+if cp == 'c':
+    print('Der Preis für die Call Option beträgt: ', round(bs_call(S, K, t, r, sigma),2))
+else:
+    print('Der Preis für die Put Option beträgt: ', round(bs_put(S, K, t, r, sigma),2))
+    
+    
+    
+ S0 = pricing_bs(S, sigma, t, r, 252, iterations)
+if cp == 'c':
+    print('Der Preis für die Call Option beträgt: ', round(bs_call(S0, K, t, r, sigma),2))
+else:
+    print('Der Preis für die Put Option beträgt: ', round(bs_put(S0, K, t, r, sigma),2))
