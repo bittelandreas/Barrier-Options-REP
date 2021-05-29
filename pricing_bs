@@ -1,9 +1,0 @@
-import numpy as np
-from brown_motion import brown_motion
-
-def pricing_bs(s, sigma, T, r, J, iterations):
-    
-    #generate n paths, each of length J
-    sj = brown_motion(s, sigma, r, T, J, iterations, 0)[1];
-    
-    return np.exp(-r*T)*np.mean(sj)
