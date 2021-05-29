@@ -7,7 +7,7 @@ N°|Ordnername|Betroffene Kapitel
 03|Single Barrier|3.2 Single Barriere Optionen
 04|Double Barrier|3.3 Double Barriere Optionen
 05|Kritik|3.4 Kritik
-06|CEV|4 Ausblick
+06|CEV|4.0 Ausblick
 
 ### Eingereicht von:
 Herr Andreas Bittel
